@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>responsive-canvas</title>
+<style>
+html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	background-color: #ddd;
+}
+#container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+canvas {
+    top: 0px;
+    left: 0px;
+}
+</style>
+</head>
+<body>
+<div id="container"></div>
+<script type="text/javascript" src="responsive-canvas.js"></script>
+<script>
+
+// Create responsive canvas!
+var canvas = new util.ResponsiveCanvas("test", // canvas id
+										"container", // canvas DOM parent
+										568, // baseWidth
+										384, // baseheight
+										[1, 1.5, 2, 3, 4], // Scale factors
+										["images/x1", "images/x1.5", "images/x2", "images/x3", "images/x4"], // Image folders
+										{	// OPTIONS
+											viewMode: "COVER", // Valid modes are: "FIT" / "COVER" (with COVER you can define a safe area).
+											safeWidth: 480,
+											safeHeight: 320,                      
+											//forcePixelRatio: 2, // Force pixelRatio for test purposes!
+											allowHiDPI: true // If false, maximum pixelRatio allowed is 1 (blurry images).
+										});
+										
+// Preload images!
+canvas.preload(["background.png", "plane.png"]);
+										
+// Let's draw! - This is the function ResponsiveCanvas will call when a redraw is necessary.
+// Remember: always think in your [baseWidth * baseHeight] layout. Let's responsive canvas do the rest.
+canvas.setDrawCallback(
+	function(context) {
+		// Draw background (for true responsiveness, use new and shiny context.drawResponsiveImage instead context.drawImage).
+		context.drawResponsiveImage("background.png", 0, 0); // Always base coords!!!
+		// Draw plane (for true responsiveness, use new and shiny context.drawResponsiveImage instead context.drawImage).
+		context.drawResponsiveImage("plane.png", 60, 60); // Always base coords!!!
+		// Draw shapes (you can use context as always).
+		var sun = {x: 450, y: 105, r: 30, p: 15, m: 2, color: "yellow"}; // Always base coords!!!
+		context.save();
+		context.beginPath();
+		context.translate(sun.x, sun.y);
+		context.moveTo(0, 0 - sun.r);
+		for (var i = 0; i < sun.p; i++) {
+			context.rotate(Math.PI / sun.p);
+			context.lineTo(0, 0 - (sun.r * sun.m));
+			context.rotate(Math.PI / sun.p);
+			context.lineTo(0, 0 - sun.r);
+		}
+		context.fillStyle = sun.color;
+		context.fill();
+		context.restore();
+		// Draw some text (you can use context as always).
+		context.fillStyle = "black";
+		context.font = "bold 22px Arial";
+		context.textAlign = "center";
+		context.fillText("Resize your browser!", 284, 220); // Always base coords!!!
+		// More samples soon!
+		// ...
+	}
+);
+
+// Bind onresize event!
+window.onresize = function() {
+    canvas.onresize();
+};
+
+// Call onready event!
+canvas.onready();
+
+</script>
+</body>
+</html>
